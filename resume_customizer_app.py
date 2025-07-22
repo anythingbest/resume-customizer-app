@@ -1,8 +1,6 @@
-# resume_customizer_app/app.py
 import streamlit as st
 import docx
 import io
-import re
 import openai
 from docx.shared import Pt
 
@@ -57,7 +55,7 @@ if st.button("🚀 Generate Custom Resume"):
         with st.spinner("Crafting your optimized resume..."):
             client = openai.OpenAI(api_key=openai_api_key)
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="gpt-3.5-turbo",  # ✅ safest model that works on all accounts
                 messages=[
                     {"role": "system", "content": "You are a professional resume generator."},
                     {"role": "user", "content": prompt}
