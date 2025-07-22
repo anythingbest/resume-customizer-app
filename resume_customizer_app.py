@@ -57,6 +57,7 @@ if st.button("🚀 Generate Custom Resume"):
         """
 
         with st.spinner("Crafting your optimized resume..."):
+            client = openai.OpenAI(api_key=openai_api_key)
             response = openai.ChatCompletion.create(
                 model="gpt-4",
                 messages=[
@@ -67,6 +68,8 @@ if st.button("🚀 Generate Custom Resume"):
                 max_tokens=1500
             )
             improved_text = response["choices"][0]["message"]["content"]
+
+            
 
         st.subheader("🔍 Preview")
         st.text_area("Modified Resume Text", improved_text, height=400)
