@@ -2,6 +2,7 @@ import streamlit as st
 import docx
 import io
 import openai
+import time
 from docx.shared import Pt
 
 # --- CONFIG ---
@@ -54,15 +55,25 @@ if st.button("🚀 Generate Custom Resume"):
 
         with st.spinner("Crafting your optimized resume..."):
             client = openai.OpenAI(api_key=openai_api_key)
-            response = client.chat.completions.create(
-                model="gpt-3.5-turbo",  # ✅ safest model that works on all accounts
-                messages=[
-                    {"role": "system", "content": "You are a professional resume generator."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.7,
-                max_tokens=1500
-            )
+            for attempt in range(3):  # retry up to 3 times
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo-0125",  # ✅ stable variant
+                        messages=[
+                            {"role": "system", "content": "You are a professional resume generator."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        temperature=0.7,
+                        max_tokens=1500
+                    )
+                    break
+                except openai.RateLimitError:
+                    st.warning(f"⏳ Rate limit hit. Retrying in 5 seconds... (attempt {attempt + 1}/3)")
+                    time.sleep(5)
+            else:
+                st.error("❌ Failed after multiple retries. Please try again later.")
+                st.stop()
+
             improved_text = response.choices[0].message.content
 
         st.subheader("🔍 Preview")
