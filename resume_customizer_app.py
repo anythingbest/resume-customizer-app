@@ -15,9 +15,9 @@ openai_api_key = st.sidebar.text_input("🔑 Enter your OpenAI API Key", type="p
 
 with st.sidebar.expander("📝 Instructions"):
     st.markdown("""
-    1. Upload your `.docx` resume
-    2. Paste any job description
-    3. Click 'Generate Custom Resume'
+    1. Upload your `.docx` resume  
+    2. Paste any job description  
+    3. Click 'Generate Custom Resume'  
     4. Download your new `.docx` resume (ATS-optimized + humanized)
     """)
 
@@ -30,8 +30,6 @@ if st.button("🚀 Generate Custom Resume"):
     if not resume_file or not jd_text or not openai_api_key:
         st.error("Please upload resume, paste JD, and enter OpenAI API key.")
     else:
-        openai.api_key = openai_api_key
-
         def extract_docx_text(file):
             doc = docx.Document(file)
             full_text = []
@@ -58,7 +56,7 @@ if st.button("🚀 Generate Custom Resume"):
 
         with st.spinner("Crafting your optimized resume..."):
             client = openai.OpenAI(api_key=openai_api_key)
-            response = openai.ChatCompletion.create(
+            response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
                     {"role": "system", "content": "You are a professional resume generator."},
@@ -67,9 +65,7 @@ if st.button("🚀 Generate Custom Resume"):
                 temperature=0.7,
                 max_tokens=1500
             )
-            improved_text = response["choices"][0]["message"]["content"]
-
-            
+            improved_text = response.choices[0].message.content
 
         st.subheader("🔍 Preview")
         st.text_area("Modified Resume Text", improved_text, height=400)
